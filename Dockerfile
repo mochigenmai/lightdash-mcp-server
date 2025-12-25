@@ -13,5 +13,6 @@ COPY package*.json ./
 RUN npm install --production
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3000
-CMD ["npm", "start"] 
+ENV PORT=8080
+EXPOSE 8080
+CMD ["node", "dist/index.js", "-port", "8080"]
