@@ -125,7 +125,7 @@ export const GetExploreRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The ID of the explore (table name). You can obtain it from the explores list.'
+      'The explore name. Get available explores from lightdash_list_explores.'
     ),
 });
 
@@ -140,17 +140,17 @@ export const RunQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The ID of the explore (table name). You can obtain it from the explores list.'
+      'The explore name. Get available explores from lightdash_list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs to include in the query (e.g., ["orders_status", "customers_country"])'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs to include in the query (e.g., ["orders_total_revenue", "orders_count"])'
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
     ),
   filters: z
     .object({
@@ -162,8 +162,12 @@ export const RunQueryRequestSchema = z.object({
   sorts: z
     .array(
       z.object({
-        fieldId: z.string(),
-        descending: z.boolean(),
+        fieldId: z
+          .string()
+          .describe(
+            'The field ID to sort by in the format "{table}_{field_name}"'
+          ),
+        descending: z.boolean().describe('True for descending order, false for ascending'),
       })
     )
     .optional()
@@ -200,17 +204,17 @@ export const CompileQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The ID of the explore (table name). You can obtain it from the explores list.'
+      'The explore name. Get available explores from lightdash_list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs to include in the query (e.g., ["orders_status", "customers_country"])'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs to include in the query (e.g., ["orders_total_revenue", "orders_count"])'
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
     ),
   filters: z
     .object({
@@ -222,8 +226,12 @@ export const CompileQueryRequestSchema = z.object({
   sorts: z
     .array(
       z.object({
-        fieldId: z.string(),
-        descending: z.boolean(),
+        fieldId: z
+          .string()
+          .describe(
+            'The field ID to sort by in the format "{table}_{field_name}"'
+          ),
+        descending: z.boolean().describe('True for descending order, false for ascending'),
       })
     )
     .optional()
@@ -260,14 +268,18 @@ export const RunUnderlyingDataQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The ID of the explore (table name). You can obtain it from the explores list.'
+      'The explore name. Get available explores from lightdash_list_explores.'
     ),
   dimensions: z
     .array(z.string())
-    .describe('Array of dimension field IDs to include in the query'),
+    .describe(
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+    ),
   metrics: z
     .array(z.string())
-    .describe('Array of metric field IDs to include in the query'),
+    .describe(
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
+    ),
   filters: z
     .object({
       dimensions: z.any().optional(),
@@ -278,8 +290,12 @@ export const RunUnderlyingDataQueryRequestSchema = z.object({
   sorts: z
     .array(
       z.object({
-        fieldId: z.string(),
-        descending: z.boolean(),
+        fieldId: z
+          .string()
+          .describe(
+            'The field ID to sort by in the format "{table}_{field_name}"'
+          ),
+        descending: z.boolean().describe('True for descending order, false for ascending'),
       })
     )
     .optional()
@@ -329,14 +345,18 @@ export const CalculateTotalRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The ID of the explore (table name). You can obtain it from the explores list.'
+      'The explore name. Get available explores from lightdash_list_explores.'
     ),
   dimensions: z
     .array(z.string())
-    .describe('Array of dimension field IDs to include in the query'),
+    .describe(
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+    ),
   metrics: z
     .array(z.string())
-    .describe('Array of metric field IDs to calculate totals for'),
+    .describe(
+      'Array of metric field IDs in the format "{table}_{field_name}" to calculate totals for. Get available metrics from lightdash_get_explore.'
+    ),
   filters: z
     .object({
       dimensions: z.any().optional(),
@@ -347,8 +367,12 @@ export const CalculateTotalRequestSchema = z.object({
   sorts: z
     .array(
       z.object({
-        fieldId: z.string(),
-        descending: z.boolean(),
+        fieldId: z
+          .string()
+          .describe(
+            'The field ID to sort by in the format "{table}_{field_name}"'
+          ),
+        descending: z.boolean().describe('True for descending order, false for ascending'),
       })
     )
     .optional()
@@ -381,7 +405,12 @@ export const RunMetricExplorerQueryRequestSchema = z.object({
     .describe(
       'The UUID of the project. You can obtain it from the project list.'
     ),
-  explore: z.string().min(1).describe('The explore name containing the metric'),
+  explore: z
+    .string()
+    .min(1)
+    .describe(
+      'The explore name. Get available explores from lightdash_list_explores or lightdash_get_metrics_catalog.'
+    ),
   metric: z.string().min(1).describe('The metric name to query'),
   startDate: z
     .string()
@@ -390,18 +419,29 @@ export const RunMetricExplorerQueryRequestSchema = z.object({
   query: z
     .object({
       comparison: z.enum(['none', 'previous_period']).optional(),
-      segmentDimension: z.string().optional(),
+      segmentDimension: z
+        .string()
+        .optional()
+        .describe(
+          'Optional dimension to segment by in the format "{table}_{field_name}". Use null for no segmentation.'
+        ),
     })
     .optional()
     .default({ comparison: 'none' })
     .describe('Query configuration for metrics explorer'),
   timeDimensionOverride: z
     .object({
-      field: z.string(),
+      field: z
+        .string()
+        .describe(
+          'The full field name including table prefix, in the format "{table}_{field_name}".'
+        ),
       interval: z.enum(['DAY', 'WEEK', 'MONTH', 'YEAR']),
     })
     .optional()
-    .describe('Optional time dimension override'),
+    .describe(
+      'Optional time dimension override. Use this to change the time granularity (DAY, WEEK, MONTH, YEAR) or the date field used for aggregation.'
+    ),
 });
 
 export const RunMetricTotalRequestSchema = z.object({
@@ -411,7 +451,12 @@ export const RunMetricTotalRequestSchema = z.object({
     .describe(
       'The UUID of the project. You can obtain it from the project list.'
     ),
-  explore: z.string().min(1).describe('The explore name containing the metric'),
+  explore: z
+    .string()
+    .min(1)
+    .describe(
+      'The explore name. Get available explores from lightdash_list_explores or lightdash_get_metrics_catalog.'
+    ),
   metric: z.string().min(1).describe('The metric name to get total for'),
   startDate: z
     .string()
