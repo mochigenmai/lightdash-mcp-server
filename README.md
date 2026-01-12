@@ -70,7 +70,7 @@ npm install lightdash-mcp-server
 ### Configuration
 
 - `LIGHTDASH_API_KEY`: Your Lightdash PAT
-- `LIGHTDASH_API_URL`: The API base URL
+- `LIGHTDASH_URL`: The API base URL
 
 ### Usage
 
@@ -95,7 +95,7 @@ npx lightdash-mcp-server
       ],
       "env": {
         "LIGHTDASH_API_KEY": "<your PAT>",
-        "LIGHTDASH_API_URL": "https://<your base url>"
+        "LIGHTDASH_URL": "https://<your base url>"
       }
     },
 ...
@@ -146,7 +146,7 @@ const transport = new StreamableHTTPClientTransport(
 await client.connect(transport);
 ```
 
-**Note:** When using HTTP mode, ensure the environment variables `LIGHTDASH_API_KEY` and `LIGHTDASH_API_URL` are set in the environment where the server is running, as they cannot be passed through MCP client configuration.
+**Note:** When using HTTP mode, ensure the environment variables `LIGHTDASH_API_KEY` and `LIGHTDASH_URL` are set in the environment where the server is running, as they cannot be passed through MCP client configuration.
 
 See `examples/list_spaces_http.ts` for a complete example of connecting to the HTTP server programmatically.
 

@@ -18,4 +18,4 @@ startCommand:
   commandFunction:
     # A function that produces the CLI command to start the MCP on stdio.
     |-
-    config => ({ command: 'npx', args: ['lightdash-mcp-server'], env: { LIGHTDASH_API_KEY: config.lightdashApiKey, LIGHTDASH_API_URL: config.lightdashApiUrl } })
+    config => ({ command: 'npx', args: ['lightdash-mcp-server'], env: { LIGHTDASH_API_KEY: config.lightdashApiKey, LIGHTDASH_URL: config.lightdashApiUrl } })

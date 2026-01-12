@@ -36,7 +36,7 @@ import {
 } from './schemas.js';
 
 const lightdashClient = createLightdashClient(
-  process.env.LIGHTDASH_API_URL || 'https://app.lightdash.cloud',
+  process.env.LIGHTDASH_URL || 'https://app.lightdash.cloud',
   {
     headers: {
       Authorization: `ApiKey ${process.env.LIGHTDASH_API_KEY}`,

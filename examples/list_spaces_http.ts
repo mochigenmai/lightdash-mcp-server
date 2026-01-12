@@ -6,20 +6,20 @@ import { config } from 'dotenv';
 config();
 
 // Get and validate required environment variables
-const apiKey = process.env.EXAMPLES_CLIENT_LIGHTDASH_API_KEY;
+const apiKey = process.env.LIGHTDASH_API_KEY;
 const apiUrl =
-  process.env.EXAMPLES_CLIENT_LIGHTDASH_API_URL ??
+  process.env.LIGHTDASH_URL ??
   'https://app.lightdash.cloud';
 
 if (!apiKey) {
   throw new Error(
-    'EXAMPLES_CLIENT_LIGHTDASH_API_KEY environment variable is required'
+    'LIGHTDASH_API_KEY environment variable is required'
   );
 }
 
 // Set environment variables for the HTTP server
 process.env.LIGHTDASH_API_KEY = apiKey;
-process.env.LIGHTDASH_API_URL = apiUrl;
+process.env.LIGHTDASH_URL = apiUrl;
 
 async function main() {
   // Initialize MCP client
@@ -46,10 +46,10 @@ async function main() {
     await client.listTools();
 
     // Call list_spaces with a project UUID
-    const projectUuid = process.env.EXAMPLES_CLIENT_LIGHTDASH_PROJECT_UUID;
+    const projectUuid = process.env.LIGHTDASH_PROJECT_UUID;
     if (!projectUuid) {
       throw new Error(
-        'EXAMPLES_CLIENT_LIGHTDASH_PROJECT_UUID environment variable is required'
+        'LIGHTDASH_PROJECT_UUID environment variable is required'
       );
     }
 
