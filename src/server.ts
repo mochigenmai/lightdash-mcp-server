@@ -12,7 +12,8 @@ export function startHttpServer(
     try {
       await httpTransport.handleRequest(req, res, req.body);
     } catch (error: unknown) {
-      console.error(`Error handling ${req.method} /mcp request:`, error);
+      console.error(`[ERROR] Error handling ${req.method} /mcp request:`, error);
+      console.error(`[ERROR] Request body was:`, JSON.stringify(req.body, null, 2));
       if (!res.headersSent) {
         const message =
           error instanceof Error ? error.message : 'Internal Server Error';
