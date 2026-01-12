@@ -872,6 +872,26 @@ server.setRequestHandler(
             request.params.arguments
           );
           const projectUuid = validateProjectUuid(args.projectUuid);
+
+          // Build query object based on provided parameters
+          // The API expects different query shapes based on comparison type (anyOf union):
+          // 1. { comparison: 'none', segmentDimension: string | null } - for segmentation
+          // 2. { comparison: 'previous_period' } - for period comparison
+          // 3. { comparison: 'different_metric', metric: {...} } - for metric comparison (not supported in this tool)
+          let query: Record<string, unknown>;
+          if (args.comparison === 'previous_period') {
+            // Previous period comparison - no segmentDimension allowed
+            query = {
+              comparison: 'previous_period',
+            };
+          } else {
+            // No comparison - use segmentation query type
+            query = {
+              comparison: 'none',
+              segmentDimension: args.segmentDimension ?? null,
+            };
+          }
+
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/metricsExplorer/{explore}/{metric}/runMetricExplorerQuery',
             {
@@ -887,7 +907,7 @@ server.setRequestHandler(
                 },
               },
               body: {
-                query: args.query ?? { comparison: 'none' },
+                query,
                 timeDimensionOverride: args.timeDimensionOverride,
               },
             }
@@ -926,6 +946,7 @@ server.setRequestHandler(
                   startDate: args.startDate,
                   endDate: args.endDate,
                   timeFrame: args.timeFrame,
+                  granularity: args.granularity,
                 },
               },
               body: args.comparisonType

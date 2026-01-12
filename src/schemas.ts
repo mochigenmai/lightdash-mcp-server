@@ -332,21 +332,21 @@ export const RunMetricExplorerQueryRequestSchema = z.object({
     .string()
     .describe('Start date for the query in YYYY-MM-DD format'),
   endDate: z.string().describe('End date for the query in YYYY-MM-DD format'),
-  query: z
-    .object({
-      comparison: z.enum(['none', 'previous_period']).optional(),
-      segmentDimension: z
-        .string()
-        .optional()
-        .describe(
-          'Optional dimension to segment by in the format "{table}_{field_name}". Use null for no segmentation.'
-        ),
-    })
+  comparison: z
+    .enum(['previous_period'])
     .optional()
-    .default({ comparison: 'none' })
-    .describe('Query configuration for metrics explorer'),
+    .describe(
+      'Optional comparison type. Set to "previous_period" to compare with the previous time period. Omit for no comparison.'
+    ),
+  segmentDimension: z
+    .string()
+    .optional()
+    .describe(
+      'Optional dimension to segment by in the format "{table}_{field_name}". Omit for no segmentation.'
+    ),
   timeDimensionOverride: z
     .object({
+      table: z.string().describe('The table name containing the time dimension.'),
       field: z
         .string()
         .describe(
@@ -374,12 +374,37 @@ export const RunMetricTotalRequestSchema = z.object({
     .describe('Start date for the query in YYYY-MM-DD format'),
   endDate: z.string().describe('End date for the query in YYYY-MM-DD format'),
   timeFrame: z
-    .enum(['DAY', 'WEEK', 'MONTH', 'YEAR'])
-    .describe('Time frame for the total calculation'),
+    .enum([
+      'RAW',
+      'YEAR',
+      'QUARTER',
+      'MONTH',
+      'WEEK',
+      'DAY',
+      'HOUR',
+      'MINUTE',
+      'SECOND',
+      'MILLISECOND',
+    ])
+    .describe('Time frame for filtering the data (e.g., DAY, WEEK, MONTH, YEAR)'),
+  granularity: z
+    .enum([
+      'RAW',
+      'YEAR',
+      'QUARTER',
+      'MONTH',
+      'WEEK',
+      'DAY',
+      'HOUR',
+      'MINUTE',
+      'SECOND',
+      'MILLISECOND',
+    ])
+    .describe('Granularity for aggregation (e.g., DAY, WEEK, MONTH, YEAR)'),
   comparisonType: z
     .enum(['none', 'previous_period'])
     .optional()
-    .describe('Optional comparison type'),
+    .describe('Optional comparison type. Use "previous_period" to compare with previous period.'),
 });
 
 export const GetMetricsTreeRequestSchema = z.object({
