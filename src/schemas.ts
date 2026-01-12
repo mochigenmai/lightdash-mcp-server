@@ -71,7 +71,7 @@ export const GetExploreRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores.'
+      'The explore name. Get available explores from list_explores.'
     ),
 });
 
@@ -81,17 +81,17 @@ export const RunQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores.'
+      'The explore name. Get available explores from list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from get_explore.'
     ),
   filters: z
     .object({
@@ -140,17 +140,17 @@ export const CompileQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores.'
+      'The explore name. Get available explores from list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from get_explore.'
     ),
   filters: z
     .object({
@@ -199,17 +199,17 @@ export const RunUnderlyingDataQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores.'
+      'The explore name. Get available explores from list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from lightdash_get_explore.'
+      'Array of metric field IDs in the format "{table}_{field_name}". Get available metrics from get_explore.'
     ),
   filters: z
     .object({
@@ -266,17 +266,17 @@ export const CalculateTotalRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores.'
+      'The explore name. Get available explores from list_explores.'
     ),
   dimensions: z
     .array(z.string())
     .describe(
-      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from lightdash_get_explore.'
+      'Array of dimension field IDs in the format "{table}_{field_name}". Get available dimensions from get_explore.'
     ),
   metrics: z
     .array(z.string())
     .describe(
-      'Array of metric field IDs in the format "{table}_{field_name}" to calculate totals for. Get available metrics from lightdash_get_explore.'
+      'Array of metric field IDs in the format "{table}_{field_name}" to calculate totals for. Get available metrics from get_explore.'
     ),
   filters: z
     .object({
@@ -325,7 +325,7 @@ export const RunMetricExplorerQueryRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores or lightdash_get_metrics_catalog.'
+      'The explore name. Get available explores from list_explores or list_metrics.'
     ),
   metric: z.string().min(1).describe('The metric name to query'),
   startDate: z
@@ -366,7 +366,7 @@ export const RunMetricTotalRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from lightdash_list_explores or lightdash_get_metrics_catalog.'
+      'The explore name. Get available explores from list_explores or list_metrics.'
     ),
   metric: z.string().min(1).describe('The metric name to get total for'),
   startDate: z

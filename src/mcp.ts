@@ -60,144 +60,144 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'lightdash_list_projects',
+        name: 'list_projects',
         description: 'List all projects in the Lightdash organization',
         inputSchema: zodToJsonSchema(ListProjectsRequestSchema),
       },
       {
-        name: 'lightdash_get_project',
+        name: 'get_project',
         description: 'Get details of a specific project',
         inputSchema: zodToJsonSchema(GetProjectRequestSchema),
       },
       {
-        name: 'lightdash_list_spaces',
+        name: 'list_spaces',
         description: 'List all spaces in a project',
         inputSchema: zodToJsonSchema(ListSpacesRequestSchema),
       },
       {
-        name: 'lightdash_list_charts',
+        name: 'list_charts',
         description: 'List all charts in a project',
         inputSchema: zodToJsonSchema(ListChartsRequestSchema),
       },
       {
-        name: 'lightdash_list_dashboards',
+        name: 'list_dashboards',
         description: 'List all dashboards in a project',
         inputSchema: zodToJsonSchema(ListDashboardsRequestSchema),
       },
       {
-        name: 'lightdash_get_custom_metrics',
-        description: 'Get custom metrics for a project',
+        name: 'list_custom_metrics',
+        description: 'List custom metrics for a project',
         inputSchema: zodToJsonSchema(GetCustomMetricsRequestSchema),
       },
       {
-        name: 'lightdash_get_catalog',
+        name: 'get_catalog',
         description: 'Get catalog for a project',
         inputSchema: zodToJsonSchema(GetCatalogRequestSchema),
       },
       {
-        name: 'lightdash_get_metrics_catalog',
-        description: 'Get metrics catalog for a project',
+        name: 'list_metrics',
+        description: 'List all metrics in a project from the metrics catalog',
         inputSchema: zodToJsonSchema(GetMetricsCatalogRequestSchema),
       },
       {
-        name: 'lightdash_get_charts_as_code',
+        name: 'get_charts_as_code',
         description: 'Get charts as code for a project',
         inputSchema: zodToJsonSchema(GetChartsAsCodeRequestSchema),
       },
       {
-        name: 'lightdash_get_dashboards_as_code',
+        name: 'get_dashboards_as_code',
         description: 'Get dashboards as code for a project',
         inputSchema: zodToJsonSchema(GetDashboardsAsCodeRequestSchema),
       },
       {
-        name: 'lightdash_get_metadata',
+        name: 'get_table_metadata',
         description: 'Get metadata for a specific table in the data catalog',
         inputSchema: zodToJsonSchema(GetMetadataRequestSchema),
       },
       {
-        name: 'lightdash_get_analytics',
+        name: 'get_table_analytics',
         description: 'Get analytics for a specific table in the data catalog',
         inputSchema: zodToJsonSchema(GetAnalyticsRequestSchema),
       },
       {
-        name: 'lightdash_get_user_attributes',
-        description: 'Get organization user attributes',
+        name: 'list_user_attributes',
+        description: 'List organization user attributes',
         inputSchema: zodToJsonSchema(GetUserAttributesRequestSchema),
       },
       {
-        name: 'lightdash_list_explores',
+        name: 'list_explores',
         description:
           'List all explores (tables) available in a project. Each explore contains dimensions and metrics that can be queried.',
         inputSchema: zodToJsonSchema(ListExploresRequestSchema),
       },
       {
-        name: 'lightdash_get_explore',
+        name: 'get_explore',
         description:
           'Get detailed information about a specific explore, including all dimensions, metrics, and their definitions. Use this to understand what fields are available for querying.',
         inputSchema: zodToJsonSchema(GetExploreRequestSchema),
       },
       {
-        name: 'lightdash_run_query',
+        name: 'run_query',
         description:
-          'Execute a query against an explore with specified dimensions and metrics. Returns the query results as data rows. Use lightdash_get_explore first to understand available fields.',
+          'Execute a query against an explore with specified dimensions and metrics. Returns the query results as data rows. Use get_explore first to understand available fields.',
         inputSchema: zodToJsonSchema(RunQueryRequestSchema),
       },
       {
-        name: 'lightdash_compile_query',
+        name: 'compile_query',
         description:
           'Compile a query to SQL without executing it. Useful for previewing the generated SQL before running a query.',
         inputSchema: zodToJsonSchema(CompileQueryRequestSchema),
       },
       {
-        name: 'lightdash_run_underlying_data_query',
+        name: 'run_raw_data_query',
         description:
           'Run a query to get the underlying row-level data for an explore. Returns detailed data rows rather than aggregated results.',
         inputSchema: zodToJsonSchema(RunUnderlyingDataQueryRequestSchema),
       },
       {
-        name: 'lightdash_run_sql_query',
+        name: 'run_sql_query',
         description:
           'Execute a raw SQL query against the data warehouse. Use with caution - this runs arbitrary SQL.',
         inputSchema: zodToJsonSchema(RunSqlQueryRequestSchema),
       },
       {
-        name: 'lightdash_calculate_total',
+        name: 'calculate_metrics_total',
         description:
           'Calculate the total values for metrics in a query. Returns aggregated totals for the specified metrics.',
         inputSchema: zodToJsonSchema(CalculateTotalRequestSchema),
       },
       {
-        name: 'lightdash_run_metric_explorer_query',
+        name: 'run_metric_timeseries',
         description:
           'Run a time-series query for a specific metric using the Metrics Explorer. Useful for analyzing metric trends over time.',
         inputSchema: zodToJsonSchema(RunMetricExplorerQueryRequestSchema),
       },
       {
-        name: 'lightdash_run_metric_total',
+        name: 'get_metric_total',
         description:
           'Get the total value for a metric over a time period. Optionally compare with previous period.',
         inputSchema: zodToJsonSchema(RunMetricTotalRequestSchema),
       },
       {
-        name: 'lightdash_get_metrics_tree',
+        name: 'get_metrics_tree',
         description:
           'Get the hierarchical tree structure of metrics relationships.',
         inputSchema: zodToJsonSchema(GetMetricsTreeRequestSchema),
       },
       {
-        name: 'lightdash_run_saved_chart',
+        name: 'run_saved_chart',
         description:
           'Execute a saved chart and return its query results. The chart must already exist in Lightdash.',
         inputSchema: zodToJsonSchema(RunSavedChartRequestSchema),
       },
       {
-        name: 'lightdash_get_chart_history',
+        name: 'get_chart_history',
         description:
           'Get the version history of a saved chart from the last 30 days.',
         inputSchema: zodToJsonSchema(GetChartHistoryRequestSchema),
       },
       {
-        name: 'lightdash_get_chart_version',
+        name: 'get_chart_version',
         description: 'Get details of a specific version of a saved chart.',
         inputSchema: zodToJsonSchema(GetChartVersionRequestSchema),
       },
@@ -223,7 +223,7 @@ server.setRequestHandler(
       }
 
       switch (request.params.name) {
-        case 'lightdash_list_projects': {
+        case 'list_projects': {
           const { data, error } = await lightdashClient.GET(
             '/api/v1/org/projects',
             {}
@@ -244,7 +244,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_project': {
+        case 'get_project': {
           const args = GetProjectRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -273,7 +273,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_list_spaces': {
+        case 'list_spaces': {
           const args = ListSpacesRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -302,7 +302,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_list_charts': {
+        case 'list_charts': {
           const args = ListChartsRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -331,7 +331,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_list_dashboards': {
+        case 'list_dashboards': {
           const args = ListDashboardsRequestSchema.parse(
             request.params.arguments
           );
@@ -362,7 +362,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_custom_metrics': {
+        case 'list_custom_metrics': {
           const args = GetCustomMetricsRequestSchema.parse(
             request.params.arguments
           );
@@ -393,7 +393,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_catalog': {
+        case 'get_catalog': {
           const args = GetCatalogRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -422,7 +422,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_metrics_catalog': {
+        case 'list_metrics': {
           const args = GetMetricsCatalogRequestSchema.parse(
             request.params.arguments
           );
@@ -453,7 +453,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_charts_as_code': {
+        case 'get_charts_as_code': {
           const args = GetChartsAsCodeRequestSchema.parse(
             request.params.arguments
           );
@@ -484,7 +484,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_dashboards_as_code': {
+        case 'get_dashboards_as_code': {
           const args = GetDashboardsAsCodeRequestSchema.parse(
             request.params.arguments
           );
@@ -515,7 +515,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_metadata': {
+        case 'get_table_metadata': {
           const args = GetMetadataRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -545,7 +545,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_analytics': {
+        case 'get_table_analytics': {
           const args = GetAnalyticsRequestSchema.parse(
             request.params.arguments
           );
@@ -577,7 +577,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_user_attributes': {
+        case 'list_user_attributes': {
           const { data, error } = await lightdashClient.GET(
             '/api/v1/org/attributes',
             {}
@@ -598,7 +598,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_list_explores': {
+        case 'list_explores': {
           const args = ListExploresRequestSchema.parse(
             request.params.arguments
           );
@@ -629,7 +629,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_explore': {
+        case 'get_explore': {
           const args = GetExploreRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
@@ -659,7 +659,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_query': {
+        case 'run_query': {
           const args = RunQueryRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
@@ -675,7 +675,10 @@ server.setRequestHandler(
                 exploreName: args.exploreId,
                 dimensions: args.dimensions,
                 metrics: args.metrics,
-                filters: args.filters ?? { dimensions: {}, metrics: {} },
+                filters: args.filters ?? {
+                  dimensions: { and: [], id: 'root' },
+                  metrics: { and: [], id: 'root' },
+                },
                 sorts: args.sorts ?? [],
                 limit: args.limit ?? 500,
                 tableCalculations: args.tableCalculations ?? [],
@@ -698,7 +701,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_compile_query': {
+        case 'compile_query': {
           const args = CompileQueryRequestSchema.parse(
             request.params.arguments
           );
@@ -716,7 +719,10 @@ server.setRequestHandler(
                 exploreName: args.exploreId,
                 dimensions: args.dimensions,
                 metrics: args.metrics,
-                filters: args.filters ?? { dimensions: {}, metrics: {} },
+                filters: args.filters ?? {
+                  dimensions: { and: [], id: 'root' },
+                  metrics: { and: [], id: 'root' },
+                },
                 sorts: args.sorts ?? [],
                 limit: args.limit ?? 500,
                 tableCalculations: args.tableCalculations ?? [],
@@ -739,7 +745,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_underlying_data_query': {
+        case 'run_raw_data_query': {
           const args = RunUnderlyingDataQueryRequestSchema.parse(
             request.params.arguments
           );
@@ -757,7 +763,10 @@ server.setRequestHandler(
                 exploreName: args.exploreId,
                 dimensions: args.dimensions,
                 metrics: args.metrics,
-                filters: args.filters ?? { dimensions: {}, metrics: {} },
+                filters: args.filters ?? {
+                  dimensions: { and: [], id: 'root' },
+                  metrics: { and: [], id: 'root' },
+                },
                 sorts: args.sorts ?? [],
                 limit: args.limit ?? 500,
                 tableCalculations: args.tableCalculations ?? [],
@@ -780,7 +789,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_sql_query': {
+        case 'run_sql_query': {
           const args = RunSqlQueryRequestSchema.parse(request.params.arguments);
           const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
@@ -812,7 +821,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_calculate_total': {
+        case 'calculate_metrics_total': {
           const args = CalculateTotalRequestSchema.parse(
             request.params.arguments
           );
@@ -831,7 +840,10 @@ server.setRequestHandler(
                   exploreName: args.exploreId,
                   dimensions: args.dimensions,
                   metrics: args.metrics,
-                  filters: args.filters ?? { dimensions: {}, metrics: {} },
+                  filters: args.filters ?? {
+                  dimensions: { and: [], id: 'root' },
+                  metrics: { and: [], id: 'root' },
+                },
                   sorts: args.sorts ?? [],
                   limit: args.limit ?? 500,
                   tableCalculations: args.tableCalculations ?? [],
@@ -855,7 +867,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_metric_explorer_query': {
+        case 'run_metric_timeseries': {
           const args = RunMetricExplorerQueryRequestSchema.parse(
             request.params.arguments
           );
@@ -896,7 +908,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_metric_total': {
+        case 'get_metric_total': {
           const args = RunMetricTotalRequestSchema.parse(
             request.params.arguments
           );
@@ -937,7 +949,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_metrics_tree': {
+        case 'get_metrics_tree': {
           const args = GetMetricsTreeRequestSchema.parse(
             request.params.arguments
           );
@@ -971,7 +983,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_run_saved_chart': {
+        case 'run_saved_chart': {
           const args = RunSavedChartRequestSchema.parse(
             request.params.arguments
           );
@@ -1004,7 +1016,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_chart_history': {
+        case 'get_chart_history': {
           const args = GetChartHistoryRequestSchema.parse(
             request.params.arguments
           );
@@ -1034,7 +1046,7 @@ server.setRequestHandler(
             ],
           };
         }
-        case 'lightdash_get_chart_version': {
+        case 'get_chart_version': {
           const args = GetChartVersionRequestSchema.parse(
             request.params.arguments
           );

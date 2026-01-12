@@ -54,7 +54,7 @@ async function main() {
     }
 
     await client.callTool({
-      name: 'lightdash_list_spaces',
+      name: 'list_spaces',
       arguments: {
         projectUuid,
       },

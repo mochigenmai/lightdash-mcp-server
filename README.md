@@ -15,40 +15,40 @@ This server provides MCP-compatible access to Lightdash's API, allowing AI assis
 Available tools:
 
 ### Project & Organization
-- `lightdash_list_projects` - List all projects in the Lightdash organization
-- `lightdash_get_project` - Get details of a specific project
-- `lightdash_list_spaces` - List all spaces in a project
-- `lightdash_get_user_attributes` - Get organization user attributes
+- `list_projects` - List all projects in the Lightdash organization
+- `get_project` - Get details of a specific project
+- `list_spaces` - List all spaces in a project
+- `list_user_attributes` - List organization user attributes
 
 ### Charts & Dashboards
-- `lightdash_list_charts` - List all charts in a project
-- `lightdash_list_dashboards` - List all dashboards in a project
-- `lightdash_get_charts_as_code` - Get charts as code for a project
-- `lightdash_get_dashboards_as_code` - Get dashboards as code for a project
-- `lightdash_run_saved_chart` - Execute a saved chart and return its query results
-- `lightdash_get_chart_history` - Get the version history of a saved chart
-- `lightdash_get_chart_version` - Get details of a specific version of a saved chart
+- `list_charts` - List all charts in a project
+- `list_dashboards` - List all dashboards in a project
+- `get_charts_as_code` - Get charts as code for a project
+- `get_dashboards_as_code` - Get dashboards as code for a project
+- `run_saved_chart` - Execute a saved chart and return its query results
+- `get_chart_history` - Get the version history of a saved chart
+- `get_chart_version` - Get details of a specific version of a saved chart
 
 ### Data Catalog & Metrics
-- `lightdash_get_catalog` - Get catalog for a project
-- `lightdash_get_custom_metrics` - Get custom metrics for a project
-- `lightdash_get_metrics_catalog` - Get metrics catalog for a project
-- `lightdash_get_metadata` - Get metadata for a specific table in the data catalog
-- `lightdash_get_analytics` - Get analytics for a specific table in the data catalog
-- `lightdash_get_metrics_tree` - Get the hierarchical tree structure of metrics relationships
+- `get_catalog` - Get catalog for a project
+- `list_custom_metrics` - List custom metrics for a project
+- `list_metrics` - List all metrics in a project from the metrics catalog
+- `get_table_metadata` - Get metadata for a specific table in the data catalog
+- `get_table_analytics` - Get analytics for a specific table in the data catalog
+- `get_metrics_tree` - Get the hierarchical tree structure of metrics relationships
 
 ### Explores & Queries
-- `lightdash_list_explores` - List all explores (tables) available in a project
-- `lightdash_get_explore` - Get detailed information about a specific explore
-- `lightdash_run_query` - Execute a query against an explore with specified dimensions and metrics
-- `lightdash_compile_query` - Compile a query to SQL without executing it
-- `lightdash_run_underlying_data_query` - Run a query to get the underlying row-level data
-- `lightdash_run_sql_query` - Execute a raw SQL query against the data warehouse
-- `lightdash_calculate_total` - Calculate the total values for metrics in a query
+- `list_explores` - List all explores (tables) available in a project
+- `get_explore` - Get detailed information about a specific explore
+- `run_query` - Execute a query against an explore with specified dimensions and metrics
+- `compile_query` - Compile a query to SQL without executing it
+- `run_raw_data_query` - Run a query to get the underlying row-level data
+- `run_sql_query` - Execute a raw SQL query against the data warehouse
+- `calculate_metrics_total` - Calculate the total values for metrics in a query
 
 ### Metrics Explorer
-- `lightdash_run_metric_explorer_query` - Run a time-series query for a specific metric
-- `lightdash_run_metric_total` - Get the total value for a metric over a time period
+- `run_metric_timeseries` - Run a time-series query for a specific metric
+- `get_metric_total` - Get the total value for a metric over a time period
 
 ## Quick Start
 
