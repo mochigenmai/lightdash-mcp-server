@@ -205,6 +205,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
+const validateProjectUuid = (projectUuid: string): string => {
+  if (!projectUuid) {
+    throw new Error(
+      'projectUuid is required. Either provide it in the request or set LIGHTDASH_PROJECT_UUID environment variable.'
+    );
+  }
+  return projectUuid;
+};
+
 server.setRequestHandler(
   CallToolRequestSchema,
   async (request: CallToolRequest) => {
@@ -237,12 +246,13 @@ server.setRequestHandler(
         }
         case 'lightdash_get_project': {
           const args = GetProjectRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -265,12 +275,13 @@ server.setRequestHandler(
         }
         case 'lightdash_list_spaces': {
           const args = ListSpacesRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/spaces',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -293,12 +304,13 @@ server.setRequestHandler(
         }
         case 'lightdash_list_charts': {
           const args = ListChartsRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/charts',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -323,12 +335,13 @@ server.setRequestHandler(
           const args = ListDashboardsRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dashboards',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -353,12 +366,13 @@ server.setRequestHandler(
           const args = GetCustomMetricsRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/custom-metrics',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -381,12 +395,13 @@ server.setRequestHandler(
         }
         case 'lightdash_get_catalog': {
           const args = GetCatalogRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dataCatalog',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -411,12 +426,13 @@ server.setRequestHandler(
           const args = GetMetricsCatalogRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dataCatalog/metrics',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -441,12 +457,13 @@ server.setRequestHandler(
           const args = GetChartsAsCodeRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/charts/code',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -471,12 +488,13 @@ server.setRequestHandler(
           const args = GetDashboardsAsCodeRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dashboards/code',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -499,12 +517,13 @@ server.setRequestHandler(
         }
         case 'lightdash_get_metadata': {
           const args = GetMetadataRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dataCatalog/{table}/metadata',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   table: args.table,
                 },
               },
@@ -530,12 +549,13 @@ server.setRequestHandler(
           const args = GetAnalyticsRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dataCatalog/{table}/analytics',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   table: args.table,
                 },
               },
@@ -582,12 +602,13 @@ server.setRequestHandler(
           const args = ListExploresRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/explores',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
             }
@@ -610,12 +631,13 @@ server.setRequestHandler(
         }
         case 'lightdash_get_explore': {
           const args = GetExploreRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/explores/{exploreId}',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   exploreId: args.exploreId,
                 },
               },
@@ -639,12 +661,13 @@ server.setRequestHandler(
         }
         case 'lightdash_run_query': {
           const args = RunQueryRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/explores/{exploreId}/runQuery',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   exploreId: args.exploreId,
                 },
               },
@@ -679,12 +702,13 @@ server.setRequestHandler(
           const args = CompileQueryRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/explores/{exploreId}/compileQuery',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   exploreId: args.exploreId,
                 },
               },
@@ -719,12 +743,13 @@ server.setRequestHandler(
           const args = RunUnderlyingDataQueryRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/explores/{exploreId}/runUnderlyingDataQuery',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   exploreId: args.exploreId,
                 },
               },
@@ -757,12 +782,13 @@ server.setRequestHandler(
         }
         case 'lightdash_run_sql_query': {
           const args = RunSqlQueryRequestSchema.parse(request.params.arguments);
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/sqlQuery',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
               body: {
@@ -790,12 +816,13 @@ server.setRequestHandler(
           const args = CalculateTotalRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/calculate-total',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
               },
               body: {
@@ -832,12 +859,13 @@ server.setRequestHandler(
           const args = RunMetricExplorerQueryRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/metricsExplorer/{explore}/{metric}/runMetricExplorerQuery',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   explore: args.explore,
                   metric: args.metric,
                 },
@@ -872,12 +900,13 @@ server.setRequestHandler(
           const args = RunMetricTotalRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.POST(
             '/api/v1/projects/{projectUuid}/metricsExplorer/{explore}/{metric}/runMetricTotal',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                   explore: args.explore,
                   metric: args.metric,
                 },
@@ -912,12 +941,13 @@ server.setRequestHandler(
           const args = GetMetricsTreeRequestSchema.parse(
             request.params.arguments
           );
+          const projectUuid = validateProjectUuid(args.projectUuid);
           const { data, error } = await lightdashClient.GET(
             '/api/v1/projects/{projectUuid}/dataCatalog/metrics/tree',
             {
               params: {
                 path: {
-                  projectUuid: args.projectUuid,
+                  projectUuid,
                 },
                 query: {
                   metricUuids: args.metricUuids,

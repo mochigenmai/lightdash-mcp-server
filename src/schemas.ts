@@ -1,126 +1,72 @@
 import { z } from 'zod';
 
+const defaultProjectUuid = process.env.LIGHTDASH_PROJECT_UUID;
+
+const projectUuidSchema = z
+  .string()
+  .uuid()
+  .optional()
+  .default(defaultProjectUuid ?? '')
+  .describe(
+    'The UUID of the project. Optional if LIGHTDASH_PROJECT_UUID env is set.'
+  );
+
 export const ListProjectsRequestSchema = z.object({});
 
 export const GetProjectRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const ListSpacesRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const ListChartsRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const ListDashboardsRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetCustomMetricsRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetCatalogRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetMetricsCatalogRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetChartsAsCodeRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetDashboardsAsCodeRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetMetadataRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   table: z.string().min(1, 'Table name cannot be empty'),
 });
 
 export const GetAnalyticsRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   table: z.string(),
 });
 
 export const GetUserAttributesRequestSchema = z.object({});
 
 export const ListExploresRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
 });
 
 export const GetExploreRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   exploreId: z
     .string()
     .min(1)
@@ -130,12 +76,7 @@ export const GetExploreRequestSchema = z.object({
 });
 
 export const RunQueryRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   exploreId: z
     .string()
     .min(1)
@@ -194,12 +135,7 @@ export const RunQueryRequestSchema = z.object({
 });
 
 export const CompileQueryRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   exploreId: z
     .string()
     .min(1)
@@ -258,12 +194,7 @@ export const CompileQueryRequestSchema = z.object({
 });
 
 export const RunUnderlyingDataQueryRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   exploreId: z
     .string()
     .min(1)
@@ -322,12 +253,7 @@ export const RunUnderlyingDataQueryRequestSchema = z.object({
 });
 
 export const RunSqlQueryRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   sql: z
     .string()
     .min(1)
@@ -335,12 +261,7 @@ export const RunSqlQueryRequestSchema = z.object({
 });
 
 export const CalculateTotalRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   exploreId: z
     .string()
     .min(1)
@@ -399,12 +320,7 @@ export const CalculateTotalRequestSchema = z.object({
 });
 
 export const RunMetricExplorerQueryRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   explore: z
     .string()
     .min(1)
@@ -445,12 +361,7 @@ export const RunMetricExplorerQueryRequestSchema = z.object({
 });
 
 export const RunMetricTotalRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   explore: z
     .string()
     .min(1)
@@ -472,12 +383,7 @@ export const RunMetricTotalRequestSchema = z.object({
 });
 
 export const GetMetricsTreeRequestSchema = z.object({
-  projectUuid: z
-    .string()
-    .uuid()
-    .describe(
-      'The UUID of the project. You can obtain it from the project list.'
-    ),
+  projectUuid: projectUuidSchema,
   metricUuids: z
     .array(z.string().uuid())
     .min(1)
