@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import crypto from 'crypto';
 import { startHttpServer } from './server.js';
 import { server } from './mcp.js';
 
@@ -29,18 +27,15 @@ if (portIndex !== -1 && args.length > portIndex + 1) {
 }
 
 if (httpPort !== null) {
-  const httpTransport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: () => crypto.randomUUID(),
-    enableJsonResponse: true,
-  });
-  server.connect(httpTransport);
-  startHttpServer(httpTransport, httpPort);
+  // HTTP mode: session management is handled in server.ts
+  startHttpServer(httpPort);
 
   console.log(
     `[INFO] MCP Server is listening on http://localhost:${httpPort}/mcp`
   );
   await new Promise<void>(() => {}); // Keep process alive
 } else {
+  // Stdio mode: single transport
   const stdioTransport = new StdioServerTransport();
   server.connect(stdioTransport);
 }

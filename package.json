@@ -41,6 +41,7 @@
   },
   "homepage": "https://github.com/syucream/lightdash-mcp-server#readme",
   "dependencies": {
+    "@google-cloud/logging": "^11.2.1",
     "@modelcontextprotocol/sdk": "^1.11.4",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.3",
