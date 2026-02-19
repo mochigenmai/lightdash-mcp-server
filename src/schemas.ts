@@ -438,46 +438,55 @@ export const CalculateTotalRequestSchema = z.object({
     .describe('Optional table calculations'),
 });
 
-export const RunMetricExplorerQueryRequestSchema = z.object({
+export const RunMetricTimeseriesRequestSchema = z.object({
   projectUuid: projectUuidSchema,
   explore: z
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from list_explores or list_metrics.'
+      'The explore name (tableName from list_metrics).'
     ),
-  metric: z.string().min(1).describe('The metric name to query'),
+  metric: z
+    .string()
+    .min(1)
+    .describe('The metric name (name from list_metrics).'),
+  timeDimension: z
+    .object({
+      table: z
+        .string()
+        .describe('The table name containing the time dimension.'),
+      field: z
+        .string()
+        .describe(
+          'The base time dimension field name from get_explore. Do NOT include interval suffix.'
+        ),
+      interval: z
+        .enum(['DAY', 'WEEK', 'MONTH', 'YEAR'])
+        .describe(
+          'Time granularity: DAY, WEEK, MONTH, or YEAR. The API appends this as a lowercase suffix to the field name.'
+        ),
+    })
+    .describe(
+      'Time dimension to use for the time-series axis. Get the table and field names from get_explore.'
+    ),
   startDate: z
     .string()
     .describe('Start date for the query in YYYY-MM-DD format'),
   endDate: z.string().describe('End date for the query in YYYY-MM-DD format'),
-  comparison: z
-    .enum(['previous_period'])
-    .optional()
-    .describe(
-      'Optional comparison type. Set to "previous_period" to compare with the previous time period. Omit for no comparison.'
-    ),
-  segmentDimension: z
-    .string()
-    .optional()
-    .describe(
-      'Optional dimension to segment by in the format "{table}_{field_name}". Omit for no segmentation.'
-    ),
-  timeDimensionOverride: z
-    .object({
-      table: z.string().describe('The table name containing the time dimension.'),
-      field: z
-        .string()
-        .describe(
-          'The EXACT field name from get_explore, without table prefix. Do NOT guess - use actual field names from API.'
-        ),
-      interval: z.enum(['DAY', 'WEEK', 'MONTH', 'YEAR']),
-    })
-    .optional()
-    .describe(
-      'Optional time dimension override. Usually not needed - API uses default time dimension. Only use if you need a different time field, and get the exact field name from get_explore first.'
-    ),
 });
+
+const TimeFramesEnum = z.enum([
+  'RAW',
+  'YEAR',
+  'QUARTER',
+  'MONTH',
+  'WEEK',
+  'DAY',
+  'HOUR',
+  'MINUTE',
+  'SECOND',
+  'MILLISECOND',
+]);
 
 export const RunMetricTotalRequestSchema = z.object({
   projectUuid: projectUuidSchema,
@@ -485,45 +494,29 @@ export const RunMetricTotalRequestSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'The explore name. Get available explores from list_explores or list_metrics.'
+      'The explore name (tableName from list_metrics).'
     ),
-  metric: z.string().min(1).describe('The metric name to get total for'),
+  metric: z.string().min(1).describe('The metric name (name from list_metrics).'),
   startDate: z
     .string()
     .describe('Start date for the query in YYYY-MM-DD format'),
   endDate: z.string().describe('End date for the query in YYYY-MM-DD format'),
-  timeFrame: z
-    .enum([
-      'RAW',
-      'YEAR',
-      'QUARTER',
-      'MONTH',
-      'WEEK',
-      'DAY',
-      'HOUR',
-      'MINUTE',
-      'SECOND',
-      'MILLISECOND',
-    ])
-    .describe('Time frame for filtering the data'),
-  granularity: z
-    .enum([
-      'RAW',
-      'YEAR',
-      'QUARTER',
-      'MONTH',
-      'WEEK',
-      'DAY',
-      'HOUR',
-      'MINUTE',
-      'SECOND',
-      'MILLISECOND',
-    ])
-    .describe('Granularity for aggregation'),
+  timeFrame: TimeFramesEnum.describe('Time frame for filtering the data'),
+  granularity: TimeFramesEnum.describe('Granularity for aggregation'),
   comparisonType: z
-    .enum(['none', 'previous_period'])
+    .enum(['none', 'previous_period', 'rolling_days'])
     .optional()
-    .describe('Optional comparison type. Use "previous_period" to compare with previous period.'),
+    .describe(
+      'Optional comparison type. Use "previous_period" to compare with previous period, or "rolling_days" with rollingDays parameter.'
+    ),
+  rollingDays: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      'Number of rolling days for comparison. Only used when comparisonType is "rolling_days".'
+    ),
 });
 
 export const GetMetricsTreeRequestSchema = z.object({

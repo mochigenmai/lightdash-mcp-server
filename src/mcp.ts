@@ -97,7 +97,7 @@ import {
   RunUnderlyingDataQueryRequestSchema,
   RunSqlQueryRequestSchema,
   CalculateTotalRequestSchema,
-  RunMetricExplorerQueryRequestSchema,
+  RunMetricTimeseriesRequestSchema,
   RunMetricTotalRequestSchema,
   GetMetricsTreeRequestSchema,
   RunSavedChartRequestSchema,
@@ -108,14 +108,37 @@ import {
   type FieldReference,
 } from './schemas.js';
 
-const lightdashClient = createLightdashClient(
-  process.env.LIGHTDASH_URL || 'https://app.lightdash.cloud',
-  {
+const lightdashBaseUrl =
+  process.env.LIGHTDASH_URL || 'https://app.lightdash.cloud';
+const lightdashApiKey = process.env.LIGHTDASH_API_KEY;
+
+const lightdashClient = createLightdashClient(lightdashBaseUrl, {
+  headers: {
+    Authorization: `ApiKey ${lightdashApiKey}`,
+  },
+});
+
+// Raw fetch helper for API endpoints not covered by the typed client (e.g. v2 async query)
+const lightdashFetch = async (
+  path: string,
+  options: RequestInit = {}
+): Promise<Response> => {
+  return fetch(`${lightdashBaseUrl}${path}`, {
+    ...options,
     headers: {
-      Authorization: `ApiKey ${process.env.LIGHTDASH_API_KEY}`,
+      'Content-Type': 'application/json',
+      Authorization: `ApiKey ${lightdashApiKey}`,
+      ...options.headers,
     },
-  }
-);
+  });
+};
+
+// Generic Lightdash API JSON response shape (for raw fetch calls)
+type LightdashApiResponse = {
+  status: string;
+  results?: Record<string, unknown>;
+  error?: { name?: string; message?: string };
+};
 
 export const server = new Server(
   {
@@ -252,7 +275,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 **Workflow:**
 1. list_metrics → get metric name and tableName
-2. run_metric_timeseries or get_metric_total with values from step 1
+2. For run_metric_timeseries: also call get_explore(tableName) to get the time dimension field
+3. run_metric_timeseries or get_metric_total with values from steps 1-2
 
 **If you need run_query:** Call get_explore and use { table, field } objects from its response.`,
         inputSchema: zodToJsonSchema(GetMetricsCatalogRequestSchema),
@@ -504,34 +528,35 @@ The response has this structure:
       // All Metrics Explorer tools depend on: list_metrics (for explore/metric names)
       {
         name: 'run_metric_timeseries',
-        description: `Query a metric over time (time-series analysis).
+        description: `Query a metric over time (time-series analysis) using the v2 async query API.
 
 **Category:** Metrics Explorer
 
-**Dependency (MUST call first):**
-- list_metrics → get "name" (metric) and "tableName" (explore) fields
+**Dependencies (MUST call in order):**
+1. list_metrics → get "name" (metric) and "tableName" (explore) fields
+2. get_explore → get time dimension table and field names
 
 **Parameters:**
 - explore: From list_metrics.tableName
 - metric: From list_metrics.name
+- timeDimension: Required. The time dimension to use for the X-axis:
+  - table: table name from get_explore
+  - field: base time dimension field name from get_explore — do NOT include interval suffix
+  - interval: DAY, WEEK, MONTH, or YEAR — determines time granularity
 - startDate: Start date (YYYY-MM-DD format)
 - endDate: End date (YYYY-MM-DD format)
-- comparison: Optional. Set to "previous_period" to compare with previous period. OMIT this parameter for no comparison (do NOT set to "none").
-- segmentDimension: Optional, field ID in "{table}_{field_name}" format from get_explore (only when comparison is omitted)
-- timeDimensionOverride: Optional, usually not needed (API uses default time dimension). If needed, call get_explore first to get exact field names:
-  - table: table name from get_explore
-  - field: EXACT field name from get_explore response - NEVER guess
-  - interval: DAY, WEEK, MONTH, or YEAR
 
 **Important differences from run_query:**
-- Uses Metrics Explorer API, NOT the query API
+- Simplified interface focused on time-series: just specify metric + time dimension + date range
 - metric parameter is just the name, NOT "{table}_{field_name}" format
 - explore parameter is the tableName from list_metrics
+- Uses v2 async query API internally (submits query, polls for results)
 
 **Workflow:**
 1. list_metrics → get metric name and tableName
-2. run_metric_timeseries with values from step 1`,
-        inputSchema: zodToJsonSchema(RunMetricExplorerQueryRequestSchema),
+2. get_explore(tableName) → find time dimension field name
+3. run_metric_timeseries with values from steps 1 and 2`,
+        inputSchema: zodToJsonSchema(RunMetricTimeseriesRequestSchema),
       },
       {
         name: 'get_metric_total',
@@ -547,9 +572,10 @@ The response has this structure:
 - metric: From list_metrics.name
 - startDate: Start date (YYYY-MM-DD format)
 - endDate: End date (YYYY-MM-DD format)
-- timeFrame: Time aggregation
-- granularity: Time grain
-- comparisonType: Optional, "none" or "previous_period"
+- timeFrame: Time frame for filtering (e.g. MONTH, YEAR)
+- granularity: Time grain for aggregation (e.g. DAY, MONTH)
+- comparisonType: Optional — "none", "previous_period", or "rolling_days"
+- rollingDays: Optional — number of rolling days (only when comparisonType is "rolling_days")
 
 **Workflow:**
 1. list_metrics → get metric name and tableName
@@ -1453,124 +1479,165 @@ server.setRequestHandler(
           };
         }
         case 'run_metric_timeseries': {
-          const args = RunMetricExplorerQueryRequestSchema.parse(
+          const args = RunMetricTimeseriesRequestSchema.parse(
             request.params.arguments
           );
           const projectUuid = validateProjectUuid(args.projectUuid);
 
-          // Build query object based on provided parameters
-          // The API expects different query shapes based on comparison type (anyOf union):
-          // 1. { comparison: 'none', segmentDimension: string | null } - for segmentation
-          // 2. { comparison: 'previous_period' } - for period comparison
-          // 3. { comparison: 'different_metric', metric: {...} } - for metric comparison (not supported in this tool)
-          let query: Record<string, unknown>;
-          if (args.comparison === 'previous_period') {
-            // Previous period comparison - no segmentDimension allowed
-            query = {
-              comparison: 'previous_period',
-            };
-          } else {
-            // No comparison - use segmentation query type
-            query = {
-              comparison: 'none',
-              segmentDimension: args.segmentDimension ?? null,
-            };
-          }
+          // Build field IDs for the v2 metric query
+          const timeDimFieldId = toFieldId({
+            table: args.timeDimension.table,
+            field: `${args.timeDimension.field}_${args.timeDimension.interval.toLowerCase()}`,
+          });
+          const metricFieldId = `${args.explore}_${args.metric}`;
 
-          const { data, error } = await logApiRequest(
-            'POST',
-            `/api/v1/projects/${projectUuid}/metricsExplorer/${args.explore}/${args.metric}/runMetricExplorerQuery`,
-            {
-              projectUuid,
-              explore: args.explore,
-              metric: args.metric,
-              startDate: args.startDate,
-              endDate: args.endDate,
-              query,
+          const queryBody = {
+            context: 'metricsExplorer',
+            query: {
+              exploreName: args.explore,
+              dimensions: [timeDimFieldId],
+              metrics: [metricFieldId],
+              filters: {
+                dimensions: {
+                  id: 'root',
+                  and: [
+                    {
+                      id: 'date_range',
+                      target: { fieldId: timeDimFieldId },
+                      operator: 'inBetween',
+                      values: [args.startDate, args.endDate],
+                    },
+                  ],
+                },
+              },
+              sorts: [{ fieldId: timeDimFieldId, descending: false }],
+              limit: 5000,
+              tableCalculations: [],
             },
-            () =>
-              lightdashClient.POST(
-                '/api/v1/projects/{projectUuid}/metricsExplorer/{explore}/{metric}/runMetricExplorerQuery',
-                {
-                  params: {
-                    path: {
-                      projectUuid,
-                      explore: args.explore,
-                      metric: args.metric,
-                    },
-                    query: {
-                      startDate: args.startDate,
-                      endDate: args.endDate,
-                    },
-                  },
-                  body: {
-                    query,
-                    timeDimensionOverride: args.timeDimensionOverride,
-                  },
-                }
-              )
-          );
-          if (error) {
+          };
+
+          // Submit async query via v2 API
+          const submitResult =
+            await logApiRequest<LightdashApiResponse>(
+              'POST',
+              `/api/v2/projects/${projectUuid}/query/metric-query`,
+              {
+                projectUuid,
+                explore: args.explore,
+                metric: args.metric,
+                timeDimension: args.timeDimension,
+                startDate: args.startDate,
+                endDate: args.endDate,
+              },
+              async () => {
+                const res = await lightdashFetch(
+                  `/api/v2/projects/${projectUuid}/query/metric-query`,
+                  { method: 'POST', body: JSON.stringify(queryBody) }
+                );
+                return (await res.json()) as LightdashApiResponse;
+              }
+            );
+
+          if (submitResult.status !== 'ok') {
             throw new Error(
-              `Lightdash API error: ${error.error.name}, ${
-                error.error.message ?? 'no message'
+              `Lightdash API error: ${submitResult.error?.name ?? 'Unknown'}, ${
+                submitResult.error?.message ?? 'Failed to submit query'
               }`
             );
           }
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(data.results, null, 2),
-              },
-            ],
-          };
+
+          const queryUuid = submitResult.results?.queryUuid as string;
+
+          // Poll for results
+          const maxAttempts = 30;
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const pollResult = (await lightdashFetch(
+              `/api/v2/projects/${projectUuid}/query/${queryUuid}`
+            ).then((res) => res.json())) as LightdashApiResponse;
+
+            if (pollResult.status === 'ok' && pollResult.results?.rows) {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: JSON.stringify(pollResult.results, null, 2),
+                  },
+                ],
+              };
+            }
+
+            if (pollResult.status === 'error') {
+              throw new Error(
+                `Lightdash API error: ${pollResult.error?.name ?? 'Unknown'}, ${
+                  pollResult.error?.message ?? 'Query failed'
+                }`
+              );
+            }
+
+            // Wait 1 second before next poll
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+
+          throw new Error(
+            'Query timed out waiting for results after 30 seconds'
+          );
         }
         case 'get_metric_total': {
           const args = RunMetricTotalRequestSchema.parse(
             request.params.arguments
           );
           const projectUuid = validateProjectUuid(args.projectUuid);
-          const { data, error } = await logApiRequest(
-            'POST',
-            `/api/v1/projects/${projectUuid}/metricsExplorer/${args.explore}/${args.metric}/runMetricTotal`,
-            {
-              projectUuid,
-              explore: args.explore,
-              metric: args.metric,
-              startDate: args.startDate,
-              endDate: args.endDate,
-              timeFrame: args.timeFrame,
-              granularity: args.granularity,
-              comparisonType: args.comparisonType,
-            },
-            () =>
-              lightdashClient.POST(
-                '/api/v1/projects/{projectUuid}/metricsExplorer/{explore}/{metric}/runMetricTotal',
-                {
-                  params: {
-                    path: {
-                      projectUuid,
-                      explore: args.explore,
-                      metric: args.metric,
-                    },
-                    query: {
-                      startDate: args.startDate,
-                      endDate: args.endDate,
-                      timeFrame: args.timeFrame,
-                      granularity: args.granularity,
-                    },
-                  },
-                  body: args.comparisonType
-                    ? { comparisonType: args.comparisonType }
-                    : undefined,
-                }
-              )
-          );
-          if (error) {
+
+          // Build query string with required params (granularity not in typed client)
+          const queryParams = new URLSearchParams({
+            timeFrame: args.timeFrame,
+            granularity: args.granularity,
+            startDate: args.startDate,
+            endDate: args.endDate,
+          });
+
+          // Build request body
+          const body: Record<string, unknown> = {};
+          if (args.comparisonType) {
+            body.comparisonType = args.comparisonType;
+          }
+          if (args.rollingDays !== undefined) {
+            body.rollingDays = args.rollingDays;
+          }
+
+          const result =
+            await logApiRequest<LightdashApiResponse>(
+              'POST',
+              `/api/v1/projects/${projectUuid}/metricsExplorer/${args.explore}/${args.metric}/runMetricTotal`,
+              {
+                projectUuid,
+                explore: args.explore,
+                metric: args.metric,
+                startDate: args.startDate,
+                endDate: args.endDate,
+                timeFrame: args.timeFrame,
+                granularity: args.granularity,
+                comparisonType: args.comparisonType,
+                rollingDays: args.rollingDays,
+              },
+              async () => {
+                const res = await lightdashFetch(
+                  `/api/v1/projects/${projectUuid}/metricsExplorer/${args.explore}/${args.metric}/runMetricTotal?${queryParams.toString()}`,
+                  {
+                    method: 'POST',
+                    body: JSON.stringify(
+                      Object.keys(body).length > 0 ? body : undefined
+                    ),
+                  }
+                );
+                return (await res.json()) as LightdashApiResponse;
+              }
+            );
+
+          if (result.status !== 'ok') {
             throw new Error(
-              `Lightdash API error: ${error.error.name}, ${
-                error.error.message ?? 'no message'
+              `Lightdash API error: ${result.error?.name ?? 'Unknown'}, ${
+                result.error?.message ?? 'no message'
               }`
             );
           }
@@ -1578,7 +1645,7 @@ server.setRequestHandler(
             content: [
               {
                 type: 'text',
-                text: JSON.stringify(data.results, null, 2),
+                text: JSON.stringify(result.results, null, 2),
               },
             ],
           };
