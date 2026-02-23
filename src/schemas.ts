@@ -46,9 +46,7 @@ const ConditionalOperatorSchema = z.enum([
 
 type ConditionalOperator = z.infer<typeof ConditionalOperatorSchema>;
 
-type FilterTargetInput =
-  | { fieldId: string }
-  | { table: string; field: string };
+type FilterTargetInput = { table: string; field: string };
 
 type FilterRuleInput = {
   id: string;
@@ -78,12 +76,12 @@ export type FiltersInput = {
   tableCalculations?: FilterGroupInput;
 };
 
-const FilterTargetSchema: z.ZodType<FilterTargetInput> = z.union([
-  z.object({ fieldId: z.string().min(1) }).passthrough(),
-  z
-    .object({ table: z.string().min(1), field: z.string().min(1) })
-    .passthrough(),
-]);
+const FilterTargetSchema: z.ZodType<FilterTargetInput> = z
+  .object({
+    table: z.string().min(1).describe('The table name from get_explore'),
+    field: z.string().min(1).describe('The field name from get_explore'),
+  })
+  .passthrough();
 
 const FilterRuleSchema: z.ZodType<FilterRuleInput> = z
   .object({
@@ -120,21 +118,37 @@ export const FiltersSchema: z.ZodType<FiltersInput> = z.object({
   tableCalculations: FilterGroupSchema.optional(),
 });
 
+// Normalized types for API output
+type NormalizedFilterRule = Omit<FilterRuleInput, 'target'> & {
+  target: { fieldId: string };
+};
+
+type NormalizedFilterGroupItem = NormalizedFilterGroup | NormalizedFilterRule;
+
+type NormalizedFilterGroup =
+  | { id: string; and: NormalizedFilterGroupItem[] }
+  | { id: string; or: NormalizedFilterGroupItem[] };
+
+export type NormalizedFilters = {
+  dimensions?: NormalizedFilterGroup;
+  metrics?: NormalizedFilterGroup;
+  tableCalculations?: NormalizedFilterGroup;
+};
+
 const normalizeFilterTarget = (
   target: FilterTargetInput
 ): { fieldId: string } => {
-  if ('fieldId' in target) {
-    return { fieldId: target.fieldId };
-  }
   return { fieldId: toFieldId({ table: target.table, field: target.field }) };
 };
 
-const normalizeFilterRule = (rule: FilterRuleInput): FilterRuleInput => ({
+const normalizeFilterRule = (rule: FilterRuleInput): NormalizedFilterRule => ({
   ...rule,
   target: normalizeFilterTarget(rule.target),
 });
 
-const normalizeFilterGroup = (group: FilterGroupInput): FilterGroupInput => {
+const normalizeFilterGroup = (
+  group: FilterGroupInput
+): NormalizedFilterGroup => {
   if ('and' in group) {
     return { ...group, and: group.and.map(normalizeFilterGroupItem) };
   }
@@ -143,7 +157,7 @@ const normalizeFilterGroup = (group: FilterGroupInput): FilterGroupInput => {
 
 const normalizeFilterGroupItem = (
   item: FilterGroupItemInput
-): FilterGroupInput | FilterRuleInput => {
+): NormalizedFilterGroupItem => {
   if ('and' in item || 'or' in item) {
     return normalizeFilterGroup(item);
   }
@@ -152,12 +166,12 @@ const normalizeFilterGroupItem = (
 
 export const normalizeFilters = (
   filters?: FiltersInput
-): FiltersInput | undefined => {
+): NormalizedFilters | undefined => {
   if (!filters) {
     return undefined;
   }
 
-  const normalized: FiltersInput = { ...filters };
+  const normalized: NormalizedFilters = {};
   if (filters.dimensions) {
     normalized.dimensions = normalizeFilterGroup(filters.dimensions);
   }
